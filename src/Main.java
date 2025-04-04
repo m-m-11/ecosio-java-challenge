@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.Semaphore;
 
 public class Main {
     private static HttpClient client;
@@ -59,24 +60,34 @@ public class Main {
         Set<String> discoverySet = ConcurrentHashMap.newKeySet();
         ConcurrentLinkedQueue<String> linksQueue = new ConcurrentLinkedQueue<>(initialLinks);
         List<Thread> virtualThreads = new ArrayList<>();
+        Semaphore semaphore = new Semaphore(100);
 
         while (!linksQueue.isEmpty() || virtualThreads.stream().anyMatch(Thread::isAlive)) {
             String link = linksQueue.poll();
-            if (link != null && !discoverySet.contains(link)) {
-                Thread virtualThread = Thread.ofVirtual().start(() -> {
-                    String linkHtml = getHtmlByUrl(link);
-                    if (linkHtml != null) {
-                        List<String> newLinks = extractLinksFromHtmlFilteredByUrlDomain(linkHtml, link);
-                        for (String newLink : newLinks) {
-                            if (discoverySet.add(link)) {
-                                linksQueue.add(newLink);
+            if (link != null && discoverySet.add(link)) {
+                try {
+                    semaphore.acquire();
+                    Thread virtualThread = Thread.ofVirtual().start(() -> {
+                        try {
+                            String linkHtml = getHtmlByUrl(link);
+                            if (linkHtml != null) {
+                                List<String> newLinks = extractLinksFromHtmlFilteredByUrlDomain(linkHtml, link);
+                                for (String newLink : newLinks) {
+                                    if (discoverySet.add(newLink)) {
+                                        linksQueue.add(newLink);
+                                    }
+                                }
+                            } else {
+                                System.out.println("Failed to retrieve HTML content for: " + link);
                             }
+                        } finally {
+                            semaphore.release();
                         }
-                    } else {
-                        System.out.println("Failed to retrieve HTML content for: " + link);
-                    }
-                });
-                virtualThreads.add(virtualThread);
+                    });
+                    virtualThreads.add(virtualThread);
+                } catch (InterruptedException e) {
+                    e.printStackTrace();
+                }
             }
         }
 
@@ -90,7 +101,6 @@ public class Main {
 
         return discoverySet;
     }
-
     /**
      * Prints the sorted result set of links.
      *
