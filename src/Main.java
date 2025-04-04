@@ -108,7 +108,7 @@ public class Main {
      */
     public static void printResultSetSorted(Set<String> links) {
         System.out.println("------------------");
-        links.stream().sorted().forEach(System.out::println);
+        System.out.println(links.stream().sorted().toList());
         System.out.println("------------------");
     }
 
