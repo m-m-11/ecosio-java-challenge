@@ -14,6 +14,8 @@ public class Main {
     private static HttpClient client;
 
     public static void main(String[] args) {
+        long startTime = System.currentTimeMillis();
+
         if (args.length != 1) {
             System.out.println("Usage: java Main <URL>");
             return;
@@ -24,8 +26,6 @@ public class Main {
             System.err.println("Invalid URL. Please provide a valid HTTP or HTTPS URL.");
             return;
         }
-
-        long startTime = System.currentTimeMillis();
 
         String html = getHtmlByUrl(url);
         if (html == null) {
