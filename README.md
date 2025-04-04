@@ -2,9 +2,10 @@
 
 For simplicity since the project is small I only used Main class. 
 
-Moreover, The requirement to only use jdk, I did not used any build tools like maven or gradle. 
+Moreover, due to the requirement to only use jdk, I did not used any build tools like maven or gradle. 
 
-For testing I performed only manual testing, as I don't have any testing framework installed and I only use pure jdk.
+For testing I performed only manual testing, as I don't have any testing framework installed and only use pure jdk.
+
 ### 1. Install dependencies
 
 `
