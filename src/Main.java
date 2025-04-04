@@ -60,7 +60,7 @@ public class Main {
         Set<String> discoverySet = ConcurrentHashMap.newKeySet();
         ConcurrentLinkedQueue<String> linksQueue = new ConcurrentLinkedQueue<>(initialLinks);
         List<Thread> virtualThreads = new ArrayList<>();
-        Semaphore semaphore = new Semaphore(100);
+        Semaphore semaphore = new Semaphore(100); // Limit the number of concurrent threads as https://ecosio.com/en/ seems to block requests if too many are made at once.
 
         while (!linksQueue.isEmpty() || virtualThreads.stream().anyMatch(Thread::isAlive)) {
             String link = linksQueue.poll();

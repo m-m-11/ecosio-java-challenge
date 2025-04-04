@@ -42,5 +42,7 @@ javac Main.java
 Please verify that the provided URL is a valid URL and that the project is able to fetch the HTML content from it.
 
 list of valid URLs:
+
 https://orf.at
+
 https://ecosio.com/en/
