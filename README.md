@@ -15,7 +15,7 @@ Java jdk 21 Eclipse Temurin
 ### 2. Clone the repository
 
 `
-git clone <URL>
+git clone https://github.com/m-m-11/ecosio-java-challenge.git
 `
 or simply download the zip file and extract it.
 
