@@ -60,7 +60,7 @@ public class Main {
         ConcurrentLinkedQueue<String> linksQueue = new ConcurrentLinkedQueue<>(initialLinks);
         List<Thread> virtualThreads = new ArrayList<>();
 
-        while (!linksQueue.isEmpty()) {
+        while (!linksQueue.isEmpty() || virtualThreads.stream().anyMatch(Thread::isAlive)) {
             String link = linksQueue.poll();
             if (link != null && !discoverySet.contains(link)) {
                 Thread virtualThread = Thread.ofVirtual().start(() -> {
@@ -68,7 +68,7 @@ public class Main {
                     if (linkHtml != null) {
                         List<String> newLinks = extractLinksFromHtmlFilteredByUrlDomain(linkHtml, link);
                         for (String newLink : newLinks) {
-                            if (!discoverySet.contains(newLink)) {
+                            if (discoverySet.add(link)) {
                                 linksQueue.add(newLink);
                             }
                         }
@@ -76,7 +76,6 @@ public class Main {
                         System.out.println("Failed to retrieve HTML content for: " + link);
                     }
                 });
-                discoverySet.add(link);
                 virtualThreads.add(virtualThread);
             }
         }
